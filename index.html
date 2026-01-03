@@ -388,6 +388,12 @@
             margin-bottom: 16px;
         }
 
+        .category-item {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
         .category-btn {
             padding: 12px !important;
             background: #f0f4f8 !important;
@@ -397,7 +403,8 @@
             margin: 0 !important;
             font-size: 13px !important;
             transition: all 0.3s ease;
-            position: relative;
+            flex: 1;
+            width: 100%;
         }
 
         .dark .category-btn {
@@ -407,30 +414,40 @@
         .category-btn.active {
             background: linear-gradient(135deg, var(--primary), var(--primary-light)) !important;
             color: white !important;
-            transform: scale(1.05);
         }
 
-        .category-btn .delete-cat {
+        .category-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .delete-cat {
             position: absolute;
-            top: -8px;
-            right: -8px;
-            width: 24px;
-            height: 24px;
+            right: 8px;
+            width: 28px;
+            height: 28px;
             background: var(--red);
             border: none;
             border-radius: 50%;
             color: white;
-            font-size: 16px;
+            font-size: 18px;
             padding: 0;
-            display: none;
+            display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: 0 2px 8px rgba(245, 101, 101, 0.3);
+            box-shadow: 0 4px 12px rgba(245, 101, 101, 0.4);
+            transition: all 0.3s ease;
+            z-index: 10;
         }
 
-        .category-btn:hover .delete-cat {
-            display: flex;
+        .delete-cat:hover {
+            transform: scale(1.15);
+            box-shadow: 0 6px 16px rgba(245, 101, 101, 0.5);
+        }
+
+        .delete-cat:active {
+            transform: scale(0.95);
         }
 
         .chart-container {
@@ -897,10 +914,12 @@ function toggleTheme() {
 function renderCategories() {
     const grid = document.getElementById("catGrid");
     grid.innerHTML = cats.map(c => `
-        <button class="category-btn ${activeCats.includes(c) ? "active" : ""}" onclick="toggleCategory(this, '${c}')">
-            ${c}
-            <button class="delete-cat" onclick="deleteCategory(event, '${c}')">✕</button>
-        </button>
+        <div class="category-item">
+            <button class="category-btn ${activeCats.includes(c) ? "active" : ""}" onclick="toggleCategory(this, '${c}')">
+                ${c}
+            </button>
+            <button class="delete-cat" onclick="deleteCategory(event, '${c}')" title="Удалить категорию">✕</button>
+        </div>
     `).join("");
     
     const allTxHtml = tx.slice().reverse().map(x => `
