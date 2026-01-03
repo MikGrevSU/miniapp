@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Mini App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<h2 id="title">Mini App</h2>
+
+<button onclick="send()">Отправить данные</button>
+
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    document.getElementById("title").innerText =
+        "Привет, " + (tg.initDataUnsafe.user?.first_name || "гость");
+
+    function send() {
+        tg.sendData(JSON.stringify({
+            ok: true,
+            time: Date.now()
+        }));
+    }
+</script>
+
+</body>
+</html>
