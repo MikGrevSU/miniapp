@@ -3,264 +3,298 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Финансы</title>
+<title>Finance</title>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
+:root {
+  --bg: #f6f7f9;
+  --card: #ffffff;
+  --primary: #2a8cff;
+  --green: #2ecc71;
+  --red: #e74c3c;
+  --text: #222;
+}
+
 * {
-    box-sizing: border-box;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont;
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system;
 }
 
 body {
-    margin: 0;
-    background: #f4f4f4;
-    color: #222;
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
 }
 
 header {
-    padding: 15px;
-    background: #2a8cff;
-    color: white;
-    text-align: center;
-    font-size: 18px;
-    font-weight: 600;
+  padding: 16px;
+  font-size: 20px;
+  font-weight: 600;
+  text-align: center;
 }
 
-nav {
-    display: flex;
-    background: white;
-    border-bottom: 1px solid #ddd;
+main {
+  padding: 12px;
+  padding-bottom: 80px;
 }
 
-nav button {
-    flex: 1;
-    padding: 12px;
-    border: none;
-    background: none;
-    font-size: 14px;
+.card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 14px;
+  margin-bottom: 12px;
 }
 
-nav button.active {
-    color: #2a8cff;
-    border-bottom: 2px solid #2a8cff;
+input, select, textarea {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  margin-bottom: 10px;
+  font-size: 15px;
 }
 
-section {
-    display: none;
-    padding: 15px;
+button {
+  width: 100%;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  background: var(--primary);
+  color: white;
+  font-size: 16px;
 }
 
-section.active {
-    display: block;
+.bottom {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  background: white;
+  border-top: 1px solid #ddd;
 }
 
-input, select, textarea, button.main {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 10px;
-    font-size: 15px;
+.bottom button {
+  flex: 1;
+  background: none;
+  color: #555;
 }
 
-button.main {
-    background: #2a8cff;
-    color: white;
-    border: none;
-    border-radius: 6px;
+.bottom button.active {
+  color: var(--primary);
 }
 
-.list {
-    background: white;
-    border-radius: 8px;
-    padding: 10px;
+.row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
 }
 
-.item {
-    display: flex;
-    justify-content: space-between;
-    padding: 8px 0;
-    border-bottom: 1px solid #eee;
+.green { color: var(--green); }
+.red { color: var(--red); }
+
+.list .item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
 }
 
-.item:last-child {
-    border-bottom: none;
+.filters {
+  display: flex;
+  gap: 6px;
 }
 
-.red { color: #e74c3c; }
-.green { color: #2ecc71; }
-
-.category {
-    display: flex;
-    justify-content: space-between;
-    padding: 8px;
-    background: white;
-    margin-bottom: 6px;
-    border-radius: 6px;
+.filters button {
+  flex: 1;
+  padding: 8px;
+  font-size: 13px;
+  background: #eee;
+  color: #333;
 }
 
-.small {
-    font-size: 13px;
-    opacity: .7;
+.filters button.active {
+  background: var(--primary);
+  color: white;
 }
 </style>
 </head>
 
 <body>
 
-<header>💰 Учёт финансов</header>
+<header>💰 Мои финансы</header>
 
-<nav>
-    <button class="active" onclick="openTab(0)">➕ Запись</button>
-    <button onclick="openTab(1)">📊 Отчёт</button>
-    <button onclick="openTab(2)">⚙️ Категории</button>
-</nav>
+<main>
 
 <!-- ЗАПИСЬ -->
-<section class="active">
+<section id="add">
+  <div class="card">
     <select id="type">
-        <option value="income">Доход</option>
-        <option value="expense">Расход</option>
+      <option value="income">Доход</option>
+      <option value="expense">Расход</option>
     </select>
 
-    <input type="number" id="amount" placeholder="Сумма">
+    <input id="amount" type="number" placeholder="Сумма">
 
     <select id="category"></select>
 
-    <input type="date" id="date">
+    <input id="date" type="date">
 
-    <textarea id="comment" placeholder="Комментарий (необязательно)"></textarea>
+    <button onclick="add()">Добавить</button>
+  </div>
 
-    <button class="main" onclick="addRecord()">Добавить</button>
-
-    <div class="list" id="records"></div>
+  <div class="card list" id="last"></div>
 </section>
 
 <!-- ОТЧЁТ -->
-<section>
-    <canvas id="chart"></canvas>
+<section id="report" style="display:none">
+  <div class="card filters">
+    <button onclick="setPeriod(1)">День</button>
+    <button onclick="setPeriod(7)">7 дней</button>
+    <button onclick="setPeriod(30)" class="active">Месяц</button>
+  </div>
 
-    <div class="list">
-        <div class="item"><span>Доходы</span><b class="green" id="sumIncome">0</b></div>
-        <div class="item"><span>Расходы</span><b class="red" id="sumExpense">0</b></div>
-        <div class="item"><span>Оборот</span><b id="sumAll">0</b></div>
-    </div>
+  <div class="card">
+    <canvas id="pie"></canvas>
+  </div>
+
+  <div class="card">
+    <canvas id="bar"></canvas>
+  </div>
+
+  <div class="card">
+    <div class="row"><span>Доход</span><b class="green" id="iSum">0</b></div>
+    <div class="row"><span>Расход</span><b class="red" id="eSum">0</b></div>
+    <div class="row"><span>Баланс</span><b id="bSum">0</b></div>
+  </div>
 </section>
 
 <!-- КАТЕГОРИИ -->
-<section>
-    <input id="newCategory" placeholder="Новая категория">
-    <button class="main" onclick="addCategory()">Добавить</button>
+<section id="settings" style="display:none">
+  <div class="card">
+    <input id="newCat" placeholder="Новая категория">
+    <button onclick="addCat()">Добавить</button>
+  </div>
 
-    <div id="categories"></div>
+  <div class="card" id="cats"></div>
 </section>
 
+</main>
+
+<div class="bottom">
+  <button class="active" onclick="tab('add')">➕</button>
+  <button onclick="tab('report')">📊</button>
+  <button onclick="tab('settings')">⚙️</button>
+</div>
+
 <script>
-const tg = Telegram.WebApp;
-tg.expand();
+Telegram.WebApp.expand();
 
-let records = JSON.parse(localStorage.getItem("records") || "[]");
-let categories = JSON.parse(localStorage.getItem("categories") || 
-    '["Продукты","Еда","Пить","Одежда","Транспорт"]');
+let data = JSON.parse(localStorage.getItem("data")||"[]");
+let cats = JSON.parse(localStorage.getItem("cats")||'["Продукты","Еда","Транспорт","Одежда"]');
+date.valueAsDate = new Date();
+let period = 30;
 
-document.getElementById("date").valueAsDate = new Date();
-
-function openTab(i) {
-    document.querySelectorAll("nav button").forEach((b,n)=>b.classList.toggle("active",n===i));
-    document.querySelectorAll("section").forEach((s,n)=>s.classList.toggle("active",n===i));
-    if(i===1) renderChart();
-    if(i===2) renderCategories();
+function save(){
+  localStorage.setItem("data",JSON.stringify(data));
+  localStorage.setItem("cats",JSON.stringify(cats));
 }
 
-function save() {
-    localStorage.setItem("records", JSON.stringify(records));
-    localStorage.setItem("categories", JSON.stringify(categories));
+function tab(id){
+  document.querySelectorAll("section").forEach(s=>s.style.display="none");
+  document.getElementById(id).style.display="block";
+  document.querySelectorAll(".bottom button").forEach(b=>b.classList.remove("active"));
+  event.target.classList.add("active");
+  if(id==="report") draw();
 }
 
-function renderCategoriesSelect() {
-    category.innerHTML = categories.map(c=>`<option>${c}</option>`).join("");
+function renderCats(){
+  category.innerHTML = cats.map(c=>`<option>${c}</option>`).join("");
+  catsEl.innerHTML = cats.map((c,i)=>`
+    <div class="item">${c}<span onclick="delCat(${i})">✖</span></div>
+  `).join("");
 }
-renderCategoriesSelect();
+const catsEl = document.getElementById("cats");
+renderCats();
 
-function addRecord() {
-    if(!amount.value) return;
-    records.push({
-        type: type.value,
-        amount: +amount.value,
-        category: category.value,
-        date: date.value
-    });
-    save();
-    amount.value="";
-    renderRecords();
-}
-
-function renderRecords() {
-    recordsEl.innerHTML = records.slice(-10).reverse().map(r=>`
-        <div class="item">
-            <span>${r.category}<div class="small">${r.date}</div></span>
-            <b class="${r.type==='income'?'green':'red'}">
-                ${r.type==='income'?'+':'-'}${r.amount}
-            </b>
-        </div>
-    `).join("");
-}
-const recordsEl = document.getElementById("records");
-renderRecords();
-
-let chart;
-function renderChart() {
-    let income=0, expense=0, byCat={};
-
-    records.forEach(r=>{
-        if(r.type==="income") income+=r.amount;
-        else {
-            expense+=r.amount;
-            byCat[r.category]=(byCat[r.category]||0)+r.amount;
-        }
-    });
-
-    sumIncome.innerText = income;
-    sumExpense.innerText = expense;
-    sumAll.innerText = income + expense;
-
-    if(chart) chart.destroy();
-    chart = new Chart(document.getElementById("chart"), {
-        type: 'pie',
-        data: {
-            labels: Object.keys(byCat),
-            datasets: [{
-                data: Object.values(byCat)
-            }]
-        }
-    });
+function add(){
+  if(!amount.value) return;
+  data.push({
+    t:type.value,
+    a:+amount.value,
+    c:category.value,
+    d:date.value
+  });
+  amount.value="";
+  save();
+  renderLast();
 }
 
-function renderCategories() {
-    categoriesEl.innerHTML = categories.map((c,i)=>`
-        <div class="category">
-            ${c}
-            <button onclick="delCategory(${i})">✖</button>
-        </div>
-    `).join("");
+function renderLast(){
+  last.innerHTML = data.slice(-5).reverse().map(x=>`
+    <div class="item">
+      <span>${x.c}</span>
+      <b class="${x.t==='income'?'green':'red'}">${x.t==='income'?'+':'-'}${x.a}</b>
+    </div>
+  `).join("");
 }
-const categoriesEl = document.getElementById("categories");
+renderLast();
 
-function addCategory() {
-    if(!newCategory.value) return;
-    categories.push(newCategory.value);
-    newCategory.value="";
-    save();
-    renderCategories();
-    renderCategoriesSelect();
+function setPeriod(p){
+  period=p;
+  document.querySelectorAll(".filters button").forEach(b=>b.classList.remove("active"));
+  event.target.classList.add("active");
+  draw();
 }
 
-function delCategory(i) {
-    categories.splice(i,1);
-    save();
-    renderCategories();
-    renderCategoriesSelect();
+let pie, bar;
+function draw(){
+  let now = new Date();
+  let from = new Date(now - period*86400000);
+  let inc=0, exp=0, byCat={};
+
+  data.filter(x=>new Date(x.d)>=from).forEach(x=>{
+    if(x.t==="income") inc+=x.a;
+    else{
+      exp+=x.a;
+      byCat[x.c]=(byCat[x.c]||0)+x.a;
+    }
+  });
+
+  iSum.innerText=inc;
+  eSum.innerText=exp;
+  bSum.innerText=inc-exp;
+
+  if(pie) pie.destroy();
+  pie = new Chart(pieEl,{
+    type:"doughnut",
+    data:{labels:Object.keys(byCat),datasets:[{data:Object.values(byCat)}]}
+  });
+
+  if(bar) bar.destroy();
+  bar = new Chart(barEl,{
+    type:"bar",
+    data:{labels:["Доход","Расход"],datasets:[{data:[inc,exp]}]}
+  });
+}
+
+const pieEl=document.getElementById("pie");
+const barEl=document.getElementById("bar");
+
+function addCat(){
+  if(!newCat.value) return;
+  cats.push(newCat.value);
+  newCat.value="";
+  save();
+  renderCats();
+}
+
+function delCat(i){
+  cats.splice(i,1);
+  save();
+  renderCats();
 }
 </script>
 
