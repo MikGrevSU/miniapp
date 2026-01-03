@@ -3,298 +3,236 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Finance</title>
+<title>Finance Mini App</title>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-:root {
-  --bg: #f6f7f9;
-  --card: #ffffff;
-  --primary: #2a8cff;
-  --green: #2ecc71;
-  --red: #e74c3c;
-  --text: #222;
+:root{
+ --bg:#f2f4f8;
+ --card:#fff;
+ --text:#222;
+ --primary:#2a8cff;
+ --green:#2ecc71;
+ --red:#e74c3c;
+ --radius:18px;
 }
 
-* {
-  box-sizing: border-box;
-  font-family: system-ui, -apple-system;
+.dark{
+ --bg:#0f172a;
+ --card:#1e293b;
+ --text:#f1f5f9;
 }
 
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--text);
+*{box-sizing:border-box;font-family:system-ui,-apple-system}
+
+body{
+ margin:0;
+ background:linear-gradient(180deg,var(--bg),#dbeafe);
+ color:var(--text);
+ transition:.3s;
 }
 
-header {
-  padding: 16px;
-  font-size: 20px;
-  font-weight: 600;
-  text-align: center;
+header{
+ padding:18px;
+ font-size:22px;
+ font-weight:700;
+ text-align:center;
 }
 
-main {
-  padding: 12px;
-  padding-bottom: 80px;
+main{padding:14px;padding-bottom:90px}
+
+.card{
+ background:var(--card);
+ border-radius:var(--radius);
+ padding:16px;
+ margin-bottom:14px;
+ box-shadow:0 10px 25px rgba(0,0,0,.05);
+ animation:fade .3s ease;
 }
 
-.card {
-  background: var(--card);
-  border-radius: 16px;
-  padding: 14px;
-  margin-bottom: 12px;
+@keyframes fade{
+ from{opacity:0;transform:translateY(10px)}
+ to{opacity:1}
 }
 
-input, select, textarea {
-  width: 100%;
-  padding: 12px;
-  border-radius: 12px;
-  border: 1px solid #ddd;
-  margin-bottom: 10px;
-  font-size: 15px;
+.row{display:flex;justify-content:space-between;margin-bottom:6px}
+
+button{
+ width:100%;
+ padding:14px;
+ border:none;
+ border-radius:16px;
+ background:var(--primary);
+ color:white;
+ font-size:16px;
 }
 
-button {
-  width: 100%;
-  padding: 14px;
-  border-radius: 14px;
-  border: none;
-  background: var(--primary);
-  color: white;
-  font-size: 16px;
+input,select,textarea{
+ width:100%;
+ padding:12px;
+ border-radius:14px;
+ border:1px solid #ccc;
+ margin-bottom:10px;
+ font-size:15px;
+ background:transparent;
+ color:var(--text);
 }
 
-.bottom {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  background: white;
-  border-top: 1px solid #ddd;
+.toggle{
+ display:flex;
+ gap:8px;
+ margin-bottom:10px;
 }
 
-.bottom button {
-  flex: 1;
-  background: none;
-  color: #555;
+.toggle div{
+ flex:1;
+ text-align:center;
+ padding:12px;
+ border-radius:14px;
+ background:#e5e7eb;
 }
 
-.bottom button.active {
-  color: var(--primary);
+.toggle .active.income{background:rgba(46,204,113,.2);color:var(--green)}
+.toggle .active.expense{background:rgba(231,76,60,.2);color:var(--red)}
+
+.bottom{
+ position:fixed;
+ bottom:0;left:0;right:0;
+ display:flex;
+ background:var(--card);
+ border-top:1px solid #ddd;
 }
 
-.row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 6px;
+.bottom button{
+ flex:1;
+ background:none;
+ color:#555;
 }
 
-.green { color: var(--green); }
-.red { color: var(--red); }
+.bottom button.active{color:var(--primary)}
 
-.list .item {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
-}
-
-.filters {
-  display: flex;
-  gap: 6px;
-}
-
-.filters button {
-  flex: 1;
-  padding: 8px;
-  font-size: 13px;
-  background: #eee;
-  color: #333;
-}
-
-.filters button.active {
-  background: var(--primary);
-  color: white;
-}
+.green{color:var(--green)}
+.red{color:var(--red)}
+.small{opacity:.6;font-size:13px}
 </style>
 </head>
 
 <body>
 
-<header>💰 Мои финансы</header>
+<header>💰 Финансы</header>
 
 <main>
 
-<!-- ЗАПИСЬ -->
-<section id="add">
-  <div class="card">
-    <select id="type">
-      <option value="income">Доход</option>
-      <option value="expense">Расход</option>
-    </select>
+<!-- DASHBOARD -->
+<section id="dash">
+ <div class="card">
+  <div class="row"><span>Баланс</span><b id="balance">0</b></div>
+  <div class="row small"><span>Доход</span><span id="inc">0</span></div>
+  <div class="row small"><span>Расход</span><span id="exp">0</span></div>
+ </div>
 
-    <input id="amount" type="number" placeholder="Сумма">
+ <div class="card" id="last"></div>
 
-    <select id="category"></select>
-
-    <input id="date" type="date">
-
-    <button onclick="add()">Добавить</button>
-  </div>
-
-  <div class="card list" id="last"></div>
+ <button onclick="openAdd('income')">➕ Доход</button>
+ <button style="margin-top:8px;background:#ef4444" onclick="openAdd('expense')">➖ Расход</button>
 </section>
 
-<!-- ОТЧЁТ -->
-<section id="report" style="display:none">
-  <div class="card filters">
-    <button onclick="setPeriod(1)">День</button>
-    <button onclick="setPeriod(7)">7 дней</button>
-    <button onclick="setPeriod(30)" class="active">Месяц</button>
+<!-- ADD -->
+<section id="add" style="display:none">
+ <div class="card">
+  <div class="toggle">
+   <div class="income active" onclick="setType('income')">Доход</div>
+   <div class="expense" onclick="setType('expense')">Расход</div>
   </div>
 
-  <div class="card">
-    <canvas id="pie"></canvas>
-  </div>
-
-  <div class="card">
-    <canvas id="bar"></canvas>
-  </div>
-
-  <div class="card">
-    <div class="row"><span>Доход</span><b class="green" id="iSum">0</b></div>
-    <div class="row"><span>Расход</span><b class="red" id="eSum">0</b></div>
-    <div class="row"><span>Баланс</span><b id="bSum">0</b></div>
-  </div>
+  <input id="amount" type="number" placeholder="Сумма">
+  <select id="category"></select>
+  <input id="date" type="date">
+  <textarea id="note" placeholder="Примечание"></textarea>
+  <button onclick="saveTx()">Сохранить</button>
+ </div>
 </section>
 
-<!-- КАТЕГОРИИ -->
+<!-- REPORTS -->
+<section id="reports" style="display:none">
+ <div class="card"><canvas id="pie"></canvas></div>
+ <div class="card"><canvas id="line"></canvas></div>
+ <div class="card">
+  <div class="row"><span>Доход</span><b class="green" id="rInc">0</b></div>
+  <div class="row"><span>Расход</span><b class="red" id="rExp">0</b></div>
+  <div class="row"><span>Итого</span><b id="rBal">0</b></div>
+ </div>
+</section>
+
+<!-- SETTINGS -->
 <section id="settings" style="display:none">
-  <div class="card">
-    <input id="newCat" placeholder="Новая категория">
-    <button onclick="addCat()">Добавить</button>
-  </div>
-
-  <div class="card" id="cats"></div>
+ <div class="card">
+  <button onclick="toggleTheme()">🌗 Сменить тему</button>
+ </div>
 </section>
 
 </main>
 
 <div class="bottom">
-  <button class="active" onclick="tab('add')">➕</button>
-  <button onclick="tab('report')">📊</button>
-  <button onclick="tab('settings')">⚙️</button>
+ <button class="active" onclick="tab('dash')">🏠</button>
+ <button onclick="tab('reports')">📊</button>
+ <button onclick="tab('settings')">⚙️</button>
 </div>
 
 <script>
 Telegram.WebApp.expand();
 
-let data = JSON.parse(localStorage.getItem("data")||"[]");
-let cats = JSON.parse(localStorage.getItem("cats")||'["Продукты","Еда","Транспорт","Одежда"]');
-date.valueAsDate = new Date();
-let period = 30;
-
-function save(){
-  localStorage.setItem("data",JSON.stringify(data));
-  localStorage.setItem("cats",JSON.stringify(cats));
-}
+let tx=JSON.parse(localStorage.getItem("tx")||"[]");
+let cats=["Продукты","Еда","Кофе","Транспорт","Такси","Топливо","Одежда","Обувь","Здоровье","Аптека","Спорт","Подписки","Связь","Коммуналка","Дом","Техника","Развлечения","Подарки","Образование","Путешествия"];
+let type="income";
+date.valueAsDate=new Date();
 
 function tab(id){
-  document.querySelectorAll("section").forEach(s=>s.style.display="none");
-  document.getElementById(id).style.display="block";
-  document.querySelectorAll(".bottom button").forEach(b=>b.classList.remove("active"));
-  event.target.classList.add("active");
-  if(id==="report") draw();
+ document.querySelectorAll("section").forEach(s=>s.style.display="none");
+ document.getElementById(id).style.display="block";
+ document.querySelectorAll(".bottom button").forEach(b=>b.classList.remove("active"));
+ event.target.classList.add("active");
+ if(id==="reports") draw();
+ if(id==="dash") dash();
 }
 
-function renderCats(){
-  category.innerHTML = cats.map(c=>`<option>${c}</option>`).join("");
-  catsEl.innerHTML = cats.map((c,i)=>`
-    <div class="item">${c}<span onclick="delCat(${i})">✖</span></div>
-  `).join("");
-}
-const catsEl = document.getElementById("cats");
-renderCats();
+function openAdd(t){ tab("add"); setType(t); }
 
-function add(){
-  if(!amount.value) return;
-  data.push({
-    t:type.value,
-    a:+amount.value,
-    c:category.value,
-    d:date.value
-  });
-  amount.value="";
-  save();
-  renderLast();
+function setType(t){
+ type=t;
+ document.querySelectorAll(".toggle div").forEach(d=>d.classList.remove("active"));
+ document.querySelector("."+t).classList.add("active");
+ category.style.display=t==="expense"?"block":"none";
 }
 
-function renderLast(){
-  last.innerHTML = data.slice(-5).reverse().map(x=>`
-    <div class="item">
-      <span>${x.c}</span>
-      <b class="${x.t==='income'?'green':'red'}">${x.t==='income'?'+':'-'}${x.a}</b>
-    </div>
-  `).join("");
-}
-renderLast();
-
-function setPeriod(p){
-  period=p;
-  document.querySelectorAll(".filters button").forEach(b=>b.classList.remove("active"));
-  event.target.classList.add("active");
-  draw();
+function saveTx(){
+ tx.push({t:type,a:+amount.value,c:category.value,d:date.value});
+ localStorage.setItem("tx",JSON.stringify(tx));
+ amount.value="";
+ tab("dash");
 }
 
-let pie, bar;
-function draw(){
-  let now = new Date();
-  let from = new Date(now - period*86400000);
-  let inc=0, exp=0, byCat={};
-
-  data.filter(x=>new Date(x.d)>=from).forEach(x=>{
-    if(x.t==="income") inc+=x.a;
-    else{
-      exp+=x.a;
-      byCat[x.c]=(byCat[x.c]||0)+x.a;
-    }
-  });
-
-  iSum.innerText=inc;
-  eSum.innerText=exp;
-  bSum.innerText=inc-exp;
-
-  if(pie) pie.destroy();
-  pie = new Chart(pieEl,{
-    type:"doughnut",
-    data:{labels:Object.keys(byCat),datasets:[{data:Object.values(byCat)}]}
-  });
-
-  if(bar) bar.destroy();
-  bar = new Chart(barEl,{
-    type:"bar",
-    data:{labels:["Доход","Расход"],datasets:[{data:[inc,exp]}]}
-  });
+function dash(){
+ let inc=0,exp=0;
+ tx.forEach(x=>x.t==="income"?inc+=x.a:exp+=x.a);
+ balance.innerText=inc-exp;
+ incEl.innerText=inc;
+ expEl.innerText=exp;
+ last.innerHTML=tx.slice(-5).reverse().map(x=>`
+  <div class="row">
+   <span>${x.t==="income"?"Доход":x.c}</span>
+   <b class="${x.t==="income"?"green":"red"}">${x.t==="income"?"+":"-"}${x.a}</b>
+  </div>
+ `).join("");
 }
 
-const pieEl=document.getElementById("pie");
-const barEl=document.getElementById("bar");
+category.innerHTML=cats.map(c=>`<option>${c}</option>`).join("");
+dash();
 
-function addCat(){
-  if(!newCat.value) return;
-  cats.push(newCat.value);
-  newCat.value="";
-  save();
-  renderCats();
-}
-
-function delCat(i){
-  cats.splice(i,1);
-  save();
-  renderCats();
+function toggleTheme(){
+ document.body.classList.toggle("dark");
 }
 </script>
 
