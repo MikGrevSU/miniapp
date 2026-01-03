@@ -82,23 +82,59 @@
             }
         }
 
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
         .stat-card {
             text-align: center;
             padding: 24px;
+            grid-column: 1;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .stat-mini {
+            text-align: center;
+            padding: 20px;
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            animation: slideIn 0.3s ease;
+        }
+
+        .dark .stat-mini {
+            background: var(--card);
         }
 
         .stat-label {
             color: var(--text-light);
-            font-size: 14px;
+            font-size: 13px;
             margin-bottom: 8px;
             text-transform: uppercase;
             letter-spacing: 1px;
+            font-weight: 600;
         }
 
         .stat-value {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 700;
             animation: countUp 0.6s ease;
+        }
+
+        .buttons-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
         }
 
         .row {
@@ -145,6 +181,10 @@
         .btn-income {
             background: linear-gradient(135deg, var(--green), #68d391);
             box-shadow: 0 10px 25px rgba(72, 187, 120, 0.3);
+        }
+
+        .btn-income:hover {
+            box-shadow: 0 15px 35px rgba(72, 187, 120, 0.4);
         }
 
         .btn-expense {
@@ -357,12 +397,40 @@
             margin: 0 !important;
             font-size: 13px !important;
             transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .dark .category-btn {
+            background: rgba(255, 255, 255, 0.1) !important;
         }
 
         .category-btn.active {
             background: linear-gradient(135deg, var(--primary), var(--primary-light)) !important;
             color: white !important;
             transform: scale(1.05);
+        }
+
+        .category-btn .delete-cat {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 24px;
+            height: 24px;
+            background: var(--red);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 16px;
+            padding: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(245, 101, 101, 0.3);
+        }
+
+        .category-btn:hover .delete-cat {
+            display: flex;
         }
 
         .chart-container {
@@ -377,23 +445,22 @@
             color: var(--text-light);
         }
 
-        .stat-row {
+        .add-category-form {
             display: flex;
-            justify-content: space-around;
-            gap: 12px;
-            margin-top: 16px;
+            gap: 8px;
+            margin-bottom: 16px;
         }
 
-        .stat-mini {
+        .add-category-form input {
             flex: 1;
-            text-align: center;
-            padding: 16px;
-            background: #f7fafc;
-            border-radius: 14px;
+            margin-bottom: 0;
         }
 
-        .dark .stat-mini {
-            background: rgba(255, 255, 255, 0.05);
+        .add-category-form button {
+            flex: 0 0 auto;
+            width: auto;
+            padding: 14px 20px;
+            margin-bottom: 0;
         }
 
         .delete-btn {
@@ -431,7 +498,7 @@
         <div class="stat-value" id="balance">0</div>
     </div>
 
-    <div class="stat-row">
+    <div class="stats-row">
         <div class="stat-mini">
             <div class="stat-label">Доход</div>
             <div class="stat-value green" id="inc">0</div>
@@ -447,8 +514,10 @@
         <div id="last"></div>
     </div>
 
-    <button class="btn-income" onclick="openAdd('income')">➕ Добавить доход</button>
-    <button class="btn-expense" onclick="openAdd('expense')">➖ Добавить расход</button>
+    <div class="buttons-grid">
+        <button class="btn-income" onclick="openAdd('income')">➕ Доход</button>
+        <button class="btn-expense" onclick="openAdd('expense')">➖ Расход</button>
+    </div>
 </section>
 
 <!-- ADD TRANSACTION -->
@@ -518,13 +587,18 @@
 
     <div class="card">
         <h3>Категории</h3>
-        <p style="color: var(--text-light); margin-bottom: 16px;">Выберите категории для отслеживания:</p>
+        <p style="color: var(--text-light); margin-bottom: 16px;">Добавьте свою категорию:</p>
+        <div class="add-category-form">
+            <input id="newCatInput" type="text" placeholder="Новая категория" style="margin-bottom:0">
+            <button onclick="addCustomCategory()">➕</button>
+        </div>
+        <p style="color: var(--text-light); margin-bottom: 16px;">Выберите категории для отслеживания (нажмите на категорию чтобы удалить):</p>
         <div class="category-grid" id="catGrid"></div>
     </div>
 
     <div class="card">
         <h3>Данные</h3>
-        <button class="btn-secondary" onclick="clearData()" style="margin-top: 8px;">🗑️ Очистить все</button>
+        <button class="btn-secondary" onclick="clearData()" style="margin-top: 0;">🗑️ Очистить все данные</button>
     </div>
 
     <div class="card">
@@ -543,7 +617,7 @@
 
 <script>
 let tx = JSON.parse(localStorage.getItem("tx") || "[]");
-let cats = ["Продукты","Еда","Кофе","Транспорт","Такси","Топливо","Одежда","Обувь","Здоровье","Аптека","Спорт","Подписки","Связь","Коммуналка","Дом","Техника","Развлечения","Подарки","Образование","Путешествия","Другое"];
+let cats = JSON.parse(localStorage.getItem("cats") || JSON.stringify(["Продукты","Еда","Кофе","Транспорт","Такси","Топливо","Одежда","Обувь","Здоровье","Аптека","Спорт","Подписки","Связь","Коммуналка","Дом","Техника","Развлечения","Подарки","Образование","Путешествия","Другое"]));
 let activeCats = JSON.parse(localStorage.getItem("activeCats") || JSON.stringify(cats));
 let type = "income";
 let period = "month";
@@ -823,7 +897,10 @@ function toggleTheme() {
 function renderCategories() {
     const grid = document.getElementById("catGrid");
     grid.innerHTML = cats.map(c => `
-        <button class="category-btn ${activeCats.includes(c) ? "active" : ""}" onclick="toggleCategory(this, '${c}')">${c}</button>
+        <button class="category-btn ${activeCats.includes(c) ? "active" : ""}" onclick="toggleCategory(this, '${c}')">
+            ${c}
+            <button class="delete-cat" onclick="deleteCategory(event, '${c}')">✕</button>
+        </button>
     `).join("");
     
     const allTxHtml = tx.slice().reverse().map(x => `
@@ -852,18 +929,40 @@ function toggleCategory(btn, cat) {
     playSuccess();
 }
 
-function exportData() {
-    const csv = "Дата,Тип,Категория,Сумма,Примечание\n" + tx.map(x => 
-        `${x.d},${x.t === "income" ? "Доход" : "Расход"},${x.c || ""},${x.a},${x.n || ""}`
-    ).join("\n");
+function addCustomCategory() {
+    const input = document.getElementById("newCatInput");
+    const newCat = input.value.trim();
     
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute("download", `finance_${new Date().toISOString().split('T')[0]}.csv`);
-    link.click();
+    if (!newCat) {
+        alert("Введите название категории");
+        return;
+    }
+    
+    if (cats.includes(newCat)) {
+        alert("Такая категория уже существует");
+        return;
+    }
+    
+    cats.push(newCat);
+    activeCats.push(newCat);
+    localStorage.setItem("cats", JSON.stringify(cats));
+    localStorage.setItem("activeCats", JSON.stringify(activeCats));
+    input.value = "";
     playSuccess();
+    renderCategories();
+}
+
+function deleteCategory(event, cat) {
+    event.stopPropagation();
+    if (confirm(`Удалить категорию "${cat}"?`)) {
+        cats = cats.filter(c => c !== cat);
+        activeCats = activeCats.filter(c => c !== cat);
+        localStorage.setItem("cats", JSON.stringify(cats));
+        localStorage.setItem("activeCats", JSON.stringify(activeCats));
+        playDelete();
+        renderCategories();
+        setType(type);
+    }
 }
 
 function clearData() {
