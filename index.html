@@ -1,41 +1,267 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <title>Mini App</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-        }
-        button {
-            width: 100%;
-            padding: 15px;
-            font-size: 18px;
-            margin-top: 20px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Финансы</title>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+* {
+    box-sizing: border-box;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont;
+}
+
+body {
+    margin: 0;
+    background: #f4f4f4;
+    color: #222;
+}
+
+header {
+    padding: 15px;
+    background: #2a8cff;
+    color: white;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+nav {
+    display: flex;
+    background: white;
+    border-bottom: 1px solid #ddd;
+}
+
+nav button {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background: none;
+    font-size: 14px;
+}
+
+nav button.active {
+    color: #2a8cff;
+    border-bottom: 2px solid #2a8cff;
+}
+
+section {
+    display: none;
+    padding: 15px;
+}
+
+section.active {
+    display: block;
+}
+
+input, select, textarea, button.main {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 10px;
+    font-size: 15px;
+}
+
+button.main {
+    background: #2a8cff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+}
+
+.list {
+    background: white;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.item:last-child {
+    border-bottom: none;
+}
+
+.red { color: #e74c3c; }
+.green { color: #2ecc71; }
+
+.category {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px;
+    background: white;
+    margin-bottom: 6px;
+    border-radius: 6px;
+}
+
+.small {
+    font-size: 13px;
+    opacity: .7;
+}
+</style>
 </head>
+
 <body>
 
-<h2 id="title">Mini App</h2>
+<header>💰 Учёт финансов</header>
 
-<button onclick="send()">Отправить данные</button>
+<nav>
+    <button class="active" onclick="openTab(0)">➕ Запись</button>
+    <button onclick="openTab(1)">📊 Отчёт</button>
+    <button onclick="openTab(2)">⚙️ Категории</button>
+</nav>
+
+<!-- ЗАПИСЬ -->
+<section class="active">
+    <select id="type">
+        <option value="income">Доход</option>
+        <option value="expense">Расход</option>
+    </select>
+
+    <input type="number" id="amount" placeholder="Сумма">
+
+    <select id="category"></select>
+
+    <input type="date" id="date">
+
+    <textarea id="comment" placeholder="Комментарий (необязательно)"></textarea>
+
+    <button class="main" onclick="addRecord()">Добавить</button>
+
+    <div class="list" id="records"></div>
+</section>
+
+<!-- ОТЧЁТ -->
+<section>
+    <canvas id="chart"></canvas>
+
+    <div class="list">
+        <div class="item"><span>Доходы</span><b class="green" id="sumIncome">0</b></div>
+        <div class="item"><span>Расходы</span><b class="red" id="sumExpense">0</b></div>
+        <div class="item"><span>Оборот</span><b id="sumAll">0</b></div>
+    </div>
+</section>
+
+<!-- КАТЕГОРИИ -->
+<section>
+    <input id="newCategory" placeholder="Новая категория">
+    <button class="main" onclick="addCategory()">Добавить</button>
+
+    <div id="categories"></div>
+</section>
 
 <script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
+const tg = Telegram.WebApp;
+tg.expand();
 
-    document.getElementById("title").innerText =
-        "Привет, " + (tg.initDataUnsafe.user?.first_name || "гость");
+let records = JSON.parse(localStorage.getItem("records") || "[]");
+let categories = JSON.parse(localStorage.getItem("categories") || 
+    '["Продукты","Еда","Пить","Одежда","Транспорт"]');
 
-    function send() {
-        tg.sendData(JSON.stringify({
-            ok: true,
-            time: Date.now()
-        }));
-    }
+document.getElementById("date").valueAsDate = new Date();
+
+function openTab(i) {
+    document.querySelectorAll("nav button").forEach((b,n)=>b.classList.toggle("active",n===i));
+    document.querySelectorAll("section").forEach((s,n)=>s.classList.toggle("active",n===i));
+    if(i===1) renderChart();
+    if(i===2) renderCategories();
+}
+
+function save() {
+    localStorage.setItem("records", JSON.stringify(records));
+    localStorage.setItem("categories", JSON.stringify(categories));
+}
+
+function renderCategoriesSelect() {
+    category.innerHTML = categories.map(c=>`<option>${c}</option>`).join("");
+}
+renderCategoriesSelect();
+
+function addRecord() {
+    if(!amount.value) return;
+    records.push({
+        type: type.value,
+        amount: +amount.value,
+        category: category.value,
+        date: date.value
+    });
+    save();
+    amount.value="";
+    renderRecords();
+}
+
+function renderRecords() {
+    recordsEl.innerHTML = records.slice(-10).reverse().map(r=>`
+        <div class="item">
+            <span>${r.category}<div class="small">${r.date}</div></span>
+            <b class="${r.type==='income'?'green':'red'}">
+                ${r.type==='income'?'+':'-'}${r.amount}
+            </b>
+        </div>
+    `).join("");
+}
+const recordsEl = document.getElementById("records");
+renderRecords();
+
+let chart;
+function renderChart() {
+    let income=0, expense=0, byCat={};
+
+    records.forEach(r=>{
+        if(r.type==="income") income+=r.amount;
+        else {
+            expense+=r.amount;
+            byCat[r.category]=(byCat[r.category]||0)+r.amount;
+        }
+    });
+
+    sumIncome.innerText = income;
+    sumExpense.innerText = expense;
+    sumAll.innerText = income + expense;
+
+    if(chart) chart.destroy();
+    chart = new Chart(document.getElementById("chart"), {
+        type: 'pie',
+        data: {
+            labels: Object.keys(byCat),
+            datasets: [{
+                data: Object.values(byCat)
+            }]
+        }
+    });
+}
+
+function renderCategories() {
+    categoriesEl.innerHTML = categories.map((c,i)=>`
+        <div class="category">
+            ${c}
+            <button onclick="delCategory(${i})">✖</button>
+        </div>
+    `).join("");
+}
+const categoriesEl = document.getElementById("categories");
+
+function addCategory() {
+    if(!newCategory.value) return;
+    categories.push(newCategory.value);
+    newCategory.value="";
+    save();
+    renderCategories();
+    renderCategoriesSelect();
+}
+
+function delCategory(i) {
+    categories.splice(i,1);
+    save();
+    renderCategories();
+    renderCategoriesSelect();
+}
 </script>
 
 </body>
