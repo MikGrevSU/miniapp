@@ -3,78 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Финансы Pro</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1"></script>
+    <title>SatbayevFind - Поиск потерянных вещей</title>
     <style>
-        :root {
-            --bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --card: #fff;
-            --card-dark: #1e1e2e;
-            --text: #2d3748;
-            --text-light: #a0aec0;
-            --primary: #667eea;
-            --primary-light: #8b9ef8;
-            --green: #48bb78;
-            --red: #f56565;
-            --orange: #ed8936;
-            --blue: #4299e1;
-            --radius: 20px;
-            --shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
-        }
-
-        .dark {
-            --bg: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
-            --card: #2d3748;
-            --text: #f1f5f9;
-            --text-light: #cbd5e0;
-            --shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-        }
-
         * {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
         body {
-            margin: 0;
-            background: var(--bg);
-            color: var(--text);
-            transition: all 0.3s ease;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            overflow-x: hidden;
+            padding: 0;
         }
 
-        header {
-            padding: 24px 16px;
-            text-align: center;
-            background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 100%);
-            backdrop-filter: blur(10px);
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: #fff;
+            min-height: 100vh;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            font-size: 28px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-        }
-
-        main {
-            padding: 16px;
-            padding-bottom: 120px;
-        }
-
-        .card {
-            background: var(--card);
-            border-radius: var(--radius);
             padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: var(--shadow);
-            animation: slideIn 0.3s ease;
-            transition: all 0.3s ease;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
         }
 
-        @keyframes slideIn {
+        .header::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="30" r="2" fill="rgba(255,255,255,0.1)"/></svg>');
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(20px, 10px); }
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Navigation */
+        .nav {
+            display: flex;
+            justify-content: space-around;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .nav-item {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            color: #667eea;
+        }
+
+        .nav-item.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .nav-item-icon {
+            font-size: 20px;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        /* Content */
+        .content {
+            padding: 20px;
+            min-height: calc(100vh - 180px);
+        }
+
+        .screen {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
             from {
                 opacity: 0;
-                transform: translateY(20px);
+                transform: translateY(10px);
             }
             to {
                 opacity: 1;
@@ -82,925 +132,1383 @@
             }
         }
 
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-
-        .stat-card {
-            text-align: center;
-            padding: 24px;
-            grid-column: 1;
-        }
-
-        .stats-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-
-        .stat-mini {
-            text-align: center;
-            padding: 20px;
-            background: var(--card);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            animation: slideIn 0.3s ease;
-        }
-
-        .dark .stat-mini {
-            background: var(--card);
-        }
-
-        .stat-label {
-            color: var(--text-light);
-            font-size: 13px;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 600;
-        }
-
-        .stat-value {
-            font-size: 28px;
-            font-weight: 700;
-            animation: countUp 0.6s ease;
-        }
-
-        .buttons-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        }
-
-        .dark .row {
-            border-bottom-color: rgba(255, 255, 255, 0.05);
-        }
-
-        .row:last-child {
-            border-bottom: none;
-        }
-
-        button {
-            width: 100%;
-            padding: 16px;
+        /* Кнопки */
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
             border: none;
-            border-radius: 16px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            color: white;
-            font-size: 16px;
+            border-radius: 8px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+            text-decoration: none;
+            text-align: center;
+            width: 100%;
             margin-bottom: 10px;
         }
 
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         }
 
-        button:active {
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-primary:active {
             transform: translateY(0);
         }
 
-        .btn-income {
-            background: linear-gradient(135deg, var(--green), #68d391);
-            box-shadow: 0 10px 25px rgba(72, 187, 120, 0.3);
-        }
-
-        .btn-income:hover {
-            box-shadow: 0 15px 35px rgba(72, 187, 120, 0.4);
-        }
-
-        .btn-expense {
-            background: linear-gradient(135deg, var(--red), #fc8181);
-            box-shadow: 0 10px 25px rgba(245, 101, 101, 0.3);
-        }
-
-        .btn-expense:hover {
-            box-shadow: 0 15px 35px rgba(245, 101, 101, 0.4);
-        }
-
         .btn-secondary {
-            background: var(--text-light);
-            box-shadow: none;
-            color: var(--text);
+            background: #f0f0f0;
+            color: #333;
+            border: 2px solid #ddd;
         }
 
-        input, select, textarea {
+        .btn-secondary:hover {
+            background: #e8e8e8;
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-outline:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        /* Карточки объявлений */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+        }
+
+        .card-image {
             width: 100%;
-            padding: 14px 16px;
-            border-radius: 14px;
-            border: 2px solid #e2e8f0;
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
             margin-bottom: 12px;
-            font-size: 15px;
-            color: var(--text);
-            background: var(--card);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            color: white;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .card-image.found {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .card-image.lost {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: white;
+            color: #667eea;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .badge.found {
+            background: #f5576c;
+            color: white;
+        }
+
+        .badge.lost {
+            background: #00f2fe;
+            color: #333;
+        }
+
+        .badge.user-created {
+            background: #4caf50;
+            color: white;
+            top: auto;
+            bottom: 10px;
+            right: 10px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #333;
+        }
+
+        .card-description {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 10px;
+        }
+
+        .card-location {
+            display: inline-block;
+            background: #f0f0f0;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            margin-bottom: 10px;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .card-user {
+            display: flex;
+            align-items: center;
+            padding-top: 10px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            margin-right: 10px;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .user-rating {
+            font-size: 12px;
+            color: #ffa500;
+        }
+
+        /* Форма добавления объявления */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
             transition: all 0.3s ease;
         }
 
-        .dark input, .dark select, .dark textarea {
-            border-color: rgba(255, 255, 255, 0.1);
-        }
-
-        input:focus, select:focus, textarea:focus {
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
             outline: none;
-            border-color: var(--primary);
+            border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
-        .toggle {
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .toggle-group {
             display: flex;
-            gap: 12px;
-            margin-bottom: 16px;
-            background: #f7fafc;
-            padding: 6px;
-            border-radius: 12px;
+            gap: 10px;
+            margin-bottom: 20px;
         }
 
-        .dark .toggle {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .toggle div {
+        .toggle-btn {
             flex: 1;
-            text-align: center;
             padding: 12px;
-            border-radius: 10px;
-            background: transparent;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 600;
-        }
-
-        .toggle .active {
+            border: 2px solid #e0e0e0;
             background: white;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            transform: scale(1.02);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
 
-        .dark .toggle .active {
-            background: rgba(102, 126, 234, 0.2);
+        .toggle-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
         }
 
-        .bottom {
+        /* Поиск и фильтры */
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 40px 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: #999;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        /* Модальное окно */
+        .modal {
+            display: none;
             position: fixed;
-            bottom: 0;
+            top: 0;
             left: 0;
             right: 0;
-            display: flex;
-            background: var(--card);
-            border-top: 1px solid rgba(0, 0, 0, 0.05);
-            box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.1);
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
             z-index: 100;
-        }
-
-        .bottom button {
-            flex: 1;
-            background: none;
-            color: var(--text-light);
-            padding: 12px;
-            margin: 0;
-            border-radius: 0;
-            box-shadow: none;
-            font-size: 24px;
-            transition: all 0.3s ease;
-        }
-
-        .bottom button.active {
-            color: var(--primary);
-            background: rgba(102, 126, 234, 0.1);
-        }
-
-        .tx-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            animation: slideIn 0.3s ease;
-        }
-
-        .dark .tx-item {
-            border-bottom-color: rgba(255, 255, 255, 0.05);
-        }
-
-        .tx-item:last-child {
-            border-bottom: none;
-        }
-
-        .tx-info {
-            flex: 1;
-        }
-
-        .tx-name {
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .tx-date {
-            font-size: 12px;
-            color: var(--text-light);
-        }
-
-        .tx-amount {
-            font-size: 18px;
-            font-weight: 700;
-            margin-right: 8px;
-        }
-
-        .green {
-            color: var(--green);
-        }
-
-        .red {
-            color: var(--red);
-        }
-
-        .orange {
-            color: var(--orange);
-        }
-
-        .blue {
-            color: var(--blue);
-        }
-
-        .small {
-            opacity: 0.7;
-            font-size: 13px;
-        }
-
-        section {
             animation: fadeIn 0.3s ease;
         }
 
-        @keyframes fadeIn {
+        .modal.active {
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .modal-content {
+            background: white;
+            width: 100%;
+            max-width: 480px;
+            border-radius: 20px 20px 0 0;
+            padding: 30px 20px 20px;
+            animation: slideUp 0.3s ease;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        @keyframes slideUp {
             from {
+                transform: translateY(100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            font-size: 20px;
+            color: #333;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        /* Вкладки в объявлении */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .tab {
+            padding: 12px 0;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #999;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            position: relative;
+            bottom: -2px;
+        }
+
+        .tab:hover {
+            color: #667eea;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* Статистика */
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        /* Уведомления */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 16px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            animation: slideInUp 0.3s ease;
+        }
+
+        @keyframes slideInUp {
+            from {
+                transform: translateY(100%);
                 opacity: 0;
             }
             to {
+                transform: translateY(0);
                 opacity: 1;
             }
         }
 
-        .period-buttons {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin-bottom: 16px;
+        .notification.success {
+            border-left: 4px solid #4caf50;
         }
 
-        .period-btn {
-            padding: 10px !important;
-            font-size: 12px !important;
-            border-radius: 10px !important;
-            background: #f0f4f8 !important;
-            color: var(--text) !important;
-            box-shadow: none !important;
-            margin-bottom: 0 !important;
-            transition: all 0.3s ease;
+        .notification.error {
+            border-left: 4px solid #f44336;
         }
 
-        .period-btn.active {
-            background: linear-gradient(135deg, var(--primary), var(--primary-light)) !important;
-            color: white !important;
+        .notification.info {
+            border-left: 4px solid #2196f3;
         }
 
-        .category-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .category-item {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .category-btn {
-            padding: 12px !important;
-            background: #f0f4f8 !important;
-            color: var(--text) !important;
-            border-radius: 12px !important;
-            box-shadow: none !important;
-            margin: 0 !important;
-            font-size: 13px !important;
-            transition: all 0.3s ease;
-            flex: 1;
-            width: 100%;
-        }
-
-        .dark .category-btn {
-            background: rgba(255, 255, 255, 0.1) !important;
-        }
-
-        .category-btn.active {
-            background: linear-gradient(135deg, var(--primary), var(--primary-light)) !important;
-            color: white !important;
-        }
-
-        .category-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
-        }
-
-        .delete-cat {
-            position: absolute;
-            right: 8px;
-            width: 28px;
-            height: 28px;
-            background: var(--red);
-            border: none;
-            border-radius: 50%;
-            color: white;
-            font-size: 18px;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(245, 101, 101, 0.4);
-            transition: all 0.3s ease;
-            z-index: 10;
-        }
-
-        .delete-cat:hover {
-            transform: scale(1.15);
-            box-shadow: 0 6px 16px rgba(245, 101, 101, 0.5);
-        }
-
-        .delete-cat:active {
-            transform: scale(0.95);
-        }
-
-        .chart-container {
-            position: relative;
-            height: 300px;
-            margin-bottom: 16px;
-        }
-
+        /* Empty state */
         .empty-state {
             text-align: center;
             padding: 40px 20px;
-            color: var(--text-light);
         }
 
-        .add-category-form {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
+        .empty-state-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            opacity: 0.3;
         }
 
-        .add-category-form input {
-            flex: 1;
-            margin-bottom: 0;
+        .empty-state-text {
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 20px;
         }
 
-        .add-category-form button {
-            flex: 0 0 auto;
-            width: auto;
-            padding: 14px 20px;
-            margin-bottom: 0;
+        /* Success screen */
+        .success-screen {
+            text-align: center;
+            padding: 60px 20px;
         }
 
+        .success-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: scaleIn 0.5s ease;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .success-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .success-text {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        /* Delete button */
         .delete-btn {
-            background: var(--red) !important;
-            padding: 6px 10px !important;
-            font-size: 12px !important;
-            margin: 0 !important;
-            box-shadow: none !important;
-            width: auto !important;
-        }
-
-        .tx-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #f44336;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
             display: flex;
-            gap: 8px;
             align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 5;
         }
 
-        h3 {
-            margin: 0 0 16px 0;
-            font-size: 18px;
+        .card:hover .delete-btn {
+            opacity: 1;
+        }
+
+        .delete-btn:hover {
+            background: #d32f2f;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .container {
+                box-shadow: none;
+                max-width: 100%;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .action-buttons .btn {
+            margin-bottom: 0;
+        }
+
+        .matches-list {
+            margin-top: 20px;
+        }
+
+        .match-item {
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .match-item:hover {
+            background: #e8e9ff;
+        }
+
+        .match-info {
+            flex: 1;
+        }
+
+        .match-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 13px;
+        }
+
+        .match-similarity {
+            font-size: 12px;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .match-arrow {
+            font-size: 20px;
+            color: #999;
         }
     </style>
 </head>
-
 <body>
-
-<header>💰 Финансы Pro</header>
-
-<main>
-
-<!-- DASHBOARD -->
-<section id="dash" style="display:block">
-    <div class="card stat-card">
-        <div class="stat-label">Текущий баланс</div>
-        <div class="stat-value" id="balance">0</div>
-    </div>
-
-    <div class="stats-row">
-        <div class="stat-mini">
-            <div class="stat-label">Доход</div>
-            <div class="stat-value green" id="inc">0</div>
-        </div>
-        <div class="stat-mini">
-            <div class="stat-label">Расход</div>
-            <div class="stat-value red" id="exp">0</div>
-        </div>
-    </div>
-
-    <div class="card">
-        <h3>Последние операции</h3>
-        <div id="last"></div>
-    </div>
-
-    <div class="buttons-grid">
-        <button class="btn-income" onclick="openAdd('income')">➕ Доход</button>
-        <button class="btn-expense" onclick="openAdd('expense')">➖ Расход</button>
-    </div>
-</section>
-
-<!-- ADD TRANSACTION -->
-<section id="add" style="display:none">
-    <div class="card">
-        <h3>Новая операция</h3>
-        
-        <div class="toggle">
-            <div class="income active" onclick="setType('income')">Доход</div>
-            <div class="expense" onclick="setType('expense')">Расход</div>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>SatbayevFind🔍</h1>
+            <p>Найти потерянное, вернуть найденное</p>
         </div>
 
-        <input id="amount" type="number" placeholder="Сумма" step="0.01">
-        <select id="category" style="display:none"></select>
-        <input id="date" type="date">
-        <textarea id="note" placeholder="Примечание" rows="3"></textarea>
-        <button onclick="saveTx()">💾 Сохранить</button>
-        <button class="btn-secondary" onclick="tab('dash')">Отмена</button>
-    </div>
-</section>
-
-<!-- REPORTS -->
-<section id="reports" style="display:none">
-    <div class="card">
-        <h3>Период</h3>
-        <div class="period-buttons">
-            <button class="period-btn active" onclick="setPeriod('week')">Неделя</button>
-            <button class="period-btn" onclick="setPeriod('month')">Месяц</button>
-            <button class="period-btn" onclick="setPeriod('quarter')">Квартал</button>
-            <button class="period-btn" onclick="setPeriod('year')">Год</button>
-        </div>
-    </div>
-
-    <div class="card">
-        <h3>Расходы по категориям</h3>
-        <div class="chart-container">
-            <canvas id="pie"></canvas>
-        </div>
-    </div>
-
-    <div class="card">
-        <h3>Доходы и расходы</h3>
-        <div class="chart-container">
-            <canvas id="line"></canvas>
-        </div>
-    </div>
-
-    <div class="card">
-        <h3>Статистика</h3>
-        <div class="row"><span>Доход</span><b class="green" id="rInc">0</b></div>
-        <div class="row"><span>Расход</span><b class="red" id="rExp">0</b></div>
-        <div class="row"><span>Баланс</span><b id="rBal">0</b></div>
-    </div>
-
-    <div class="card">
-        <h3>По категориям</h3>
-        <div id="categoryStats"></div>
-    </div>
-</section>
-
-<!-- SETTINGS -->
-<section id="settings" style="display:none">
-    <div class="card">
-        <h3>Оформление</h3>
-        <button onclick="toggleTheme()">🌗 Сменить тему</button>
-    </div>
-
-    <div class="card">
-        <h3>Категории</h3>
-        <p style="color: var(--text-light); margin-bottom: 16px;">Добавьте свою категорию:</p>
-        <div class="add-category-form">
-            <input id="newCatInput" type="text" placeholder="Новая категория" style="margin-bottom:0">
-            <button onclick="addCustomCategory()">➕</button>
-        </div>
-        <p style="color: var(--text-light); margin-bottom: 16px;">Выберите категории для отслеживания (нажмите на категорию чтобы удалить):</p>
-        <div class="category-grid" id="catGrid"></div>
-    </div>
-
-    <div class="card">
-        <h3>Данные</h3>
-        <button class="btn-secondary" onclick="clearData()" style="margin-top: 0;">🗑️ Очистить все данные</button>
-    </div>
-
-    <div class="card">
-        <h3>Все операции</h3>
-        <div id="allTx" style="max-height: 400px; overflow-y: auto;"></div>
-    </div>
-</section>
-
-</main>
-
-<div class="bottom">
-    <button class="active" onclick="tabClick('dash')">🏠</button>
-    <button onclick="tabClick('reports')">📊</button>
-    <button onclick="tabClick('settings')">⚙️</button>
-</div>
-
-<script>
-let tx = JSON.parse(localStorage.getItem("tx") || "[]");
-let cats = JSON.parse(localStorage.getItem("cats") || JSON.stringify(["Продукты","Еда","Кофе","Транспорт","Такси","Топливо","Одежда","Обувь","Здоровье","Аптека","Спорт","Подписки","Связь","Коммуналка","Дом","Техника","Развлечения","Подарки","Образование","Путешествия","Другое"]));
-let activeCats = JSON.parse(localStorage.getItem("activeCats") || JSON.stringify(cats));
-let type = "income";
-let period = "month";
-let pieChart = null, lineChart = null;
-
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-function playSound(freq, duration, vol = 0.3) {
-    try {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.frequency.value = freq;
-        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
-        osc.start(audioCtx.currentTime);
-        osc.stop(audioCtx.currentTime + duration);
-    } catch(e) {}
-}
-
-function playSuccess() {
-    playSound(800, 0.1);
-    setTimeout(() => playSound(1000, 0.1, 0.2), 50);
-}
-
-function playDelete() {
-    playSound(400, 0.15, 0.2);
-}
-
-date.valueAsDate = new Date();
-
-function tabClick(id) {
-    event.preventDefault();
-    tab(id);
-}
-
-function tab(id) {
-    document.querySelectorAll("section").forEach(s => s.style.display = "none");
-    document.getElementById(id).style.display = "block";
-    document.querySelectorAll(".bottom button").forEach(b => b.classList.remove("active"));
-    event.target.classList.add("active");
-    if (id === "reports") {
-        setTimeout(() => draw(), 100);
-    }
-    if (id === "dash") dash();
-    if (id === "settings") renderCategories();
-}
-
-function openAdd(t) {
-    document.querySelectorAll("section").forEach(s => s.style.display = "none");
-    document.getElementById("add").style.display = "block";
-    document.querySelectorAll(".bottom button").forEach(b => b.classList.remove("active"));
-    setType(t);
-    setTimeout(() => document.getElementById("amount").focus(), 100);
-}
-
-function setType(t) {
-    type = t;
-    document.querySelectorAll(".toggle div").forEach(d => d.classList.remove("active"));
-    document.querySelector(".toggle ." + t).classList.add("active");
-    category.style.display = t === "expense" ? "block" : "none";
-    if (t === "expense") {
-        category.innerHTML = activeCats.map(c => `<option>${c}</option>`).join("");
-    }
-}
-
-function saveTx() {
-    if (!amount.value) {
-        playSound(400, 0.3, 0.1);
-        return alert("Введите сумму!");
-    }
-    const newTx = {
-        t: type,
-        a: +amount.value,
-        c: category.value || null,
-        d: date.value,
-        n: note.value,
-        id: Date.now()
-    };
-    tx.push(newTx);
-    localStorage.setItem("tx", JSON.stringify(tx));
-    amount.value = "";
-    note.value = "";
-    playSuccess();
-    document.querySelectorAll("section").forEach(s => s.style.display = "none");
-    document.getElementById("dash").style.display = "block";
-    document.querySelectorAll(".bottom button").forEach(b => b.classList.remove("active"));
-    document.querySelectorAll(".bottom button")[0].classList.add("active");
-    dash();
-}
-
-function deleteTx(id) {
-    if (confirm("Удалить операцию?")) {
-        tx = tx.filter(t => t.id !== id);
-        localStorage.setItem("tx", JSON.stringify(tx));
-        playDelete();
-        dash();
-    }
-}
-
-function dash() {
-    let inc = 0, exp = 0;
-    tx.forEach(x => x.t === "income" ? inc += x.a : exp += x.a);
-    const bal = inc - exp;
-    animateValue("balance", bal);
-    animateValue("inc", inc);
-    animateValue("exp", exp);
-    last.innerHTML = tx.slice(-10).reverse().map(x => `
-        <div class="tx-item">
-            <div class="tx-info">
-                <div class="tx-name">${x.t === "income" ? "✅ Доход" : "📌 " + x.c}</div>
-                <div class="tx-date">${new Date(x.d).toLocaleDateString('ru-RU')}</div>
+        <!-- Navigation -->
+        <div class="nav">
+            <div class="nav-item active" onclick="showScreen('feed')">
+                <span class="nav-item-icon">📰</span>
+                Лента
             </div>
-            <div class="tx-actions">
-                <div class="tx-amount ${x.t === "income" ? "green" : "red"}">${x.t === "income" ? "+" : "-"}${x.a.toFixed(2)}</div>
-                <button class="delete-btn" onclick="deleteTx(${x.id})">✕</button>
+            <div class="nav-item" onclick="showScreen('search')">
+                <span class="nav-item-icon">🔎</span>
+                Поиск
+            </div>
+            <div class="nav-item" onclick="showScreen('create')">
+                <span class="nav-item-icon">➕</span>
+                Добавить
+            </div>
+            <div class="nav-item" onclick="showScreen('profile')">
+                <span class="nav-item-icon">👤</span>
+                Профиль
             </div>
         </div>
-    `).join("");
-    if (tx.length === 0) {
-        last.innerHTML = '<div class="empty-state">📭 Нет операций</div>';
-    }
-}
 
-function animateValue(id, target) {
-    const elem = document.getElementById(id);
-    if (!elem) return;
-    const current = parseFloat(elem.innerText) || 0;
-    const diff = target - current;
-    const steps = 60;
-    let step = 0;
-    const timer = setInterval(() => {
-        step++;
-        const val = current + (diff * step / steps);
-        elem.innerText = val.toFixed(2);
-        if (step >= steps) {
-            elem.innerText = target.toFixed(2);
-            clearInterval(timer);
-        }
-    }, 8);
-}
+        <!-- Content -->
+        <div class="content">
+            <!-- FEED Screen -->
+            <div class="screen active" id="screen-feed">
+                <div class="filter-tabs">
+                    <div class="filter-btn active" onclick="filterCards('all')">Все</div>
+                    <div class="filter-btn" onclick="filterCards('lost')">Потеряны 📍</div>
+                    <div class="filter-btn" onclick="filterCards('found')">Найдены ✅</div>
+                </div>
 
-function setPeriod(p) {
-    period = p;
-    document.querySelectorAll(".period-btn").forEach(b => b.classList.remove("active"));
-    event.target.classList.add("active");
-    draw();
-}
+                <div id="cards-container">
+                    <!-- Карточки будут добавлены JavaScript -->
+                </div>
+            </div>
 
-function getDateRange() {
-    const today = new Date();
-    const ranges = {
-        week: new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000),
-        month: new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000),
-        quarter: new Date(today.getTime() - 90 * 24 * 60 * 60 * 1000),
-        year: new Date(today.getTime() - 365 * 24 * 60 * 60 * 1000)
-    };
-    return ranges[period];
-}
+            <!-- SEARCH Screen -->
+            <div class="screen" id="screen-search">
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="Поиск по названию, месту...">
+                    <span class="search-icon">🔍</span>
+                </div>
 
-function draw() {
-    const filtered = tx.filter(x => new Date(x.d) >= getDateRange());
-    const income = filtered.filter(x => x.t === "income");
-    const expense = filtered.filter(x => x.t === "expense");
+                <div class="filter-tabs">
+                    <div class="filter-btn active" onclick="filterSearch('all')">Все категории</div>
+                    <div class="filter-btn" onclick="filterSearch('electronics')">🎧 Электроника</div>
+                    <div class="filter-btn" onclick="filterSearch('documents')">📄 Документы</div>
+                    <div class="filter-btn" onclick="filterSearch('accessories')">👜 Аксессуары</div>
+                    <div class="filter-btn" onclick="filterSearch('other')">📦 Другое</div>
+                </div>
 
-    const totalInc = income.reduce((s, x) => s + x.a, 0);
-    const totalExp = expense.reduce((s, x) => s + x.a, 0);
+                <div id="search-results">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔍</div>
+                        <div class="empty-state-text">Введите что-то для поиска</div>
+                    </div>
+                </div>
+            </div>
 
-    rInc.innerText = totalInc.toFixed(2);
-    rExp.innerText = totalExp.toFixed(2);
-    rBal.innerText = (totalInc - totalExp).toFixed(2);
-    rBal.className = (totalInc - totalExp) >= 0 ? "green" : "red";
+            <!-- CREATE Screen -->
+            <div class="screen" id="screen-create">
+                <h2 style="font-size: 20px; margin-bottom: 20px; color: #333;">Создать объявление</h2>
 
-    // Pie Chart
-    const catData = {};
-    expense.forEach(x => {
-        catData[x.c] = (catData[x.c] || 0) + x.a;
-    });
+                <div class="toggle-group">
+                    <div class="toggle-btn active" onclick="toggleCreateType('lost', this)">Я потерял</div>
+                    <div class="toggle-btn" onclick="toggleCreateType('found', this)">Я нашел</div>
+                </div>
 
-    const colors = ["#667eea", "#ed8936", "#f56565", "#48bb78", "#38b2ac", "#9f7aea", "#ecc94b", "#4299e1", "#fc8181", "#81e6d9"];
-    const ctx = document.getElementById("pie");
-    if (pieChart) pieChart.destroy();
-    
-    if (Object.keys(catData).length > 0) {
-        pieChart = new Chart(ctx, {
-            type: "doughnut",
-            data: {
-                labels: Object.keys(catData),
-                datasets: [{
-                    data: Object.values(catData),
-                    backgroundColor: colors,
-                    borderColor: "transparent"
-                }]
+                <div id="create-form">
+                    <div class="form-group">
+                        <label>Название предмета</label>
+                        <input type="text" id="item-name" placeholder="Например: Синий рюкзак">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Категория</label>
+                        <select id="item-category">
+                            <option value="accessories">👜 Аксессуары</option>
+                            <option value="electronics">🎧 Электроника</option>
+                            <option value="documents">📄 Документы</option>
+                            <option value="money">💰 Деньги</option>
+                            <option value="keys">🔑 Ключи</option>
+                            <option value="other">📦 Другое</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Описание</label>
+                        <textarea id="item-description" placeholder="Опишите предмет подробнее, его особенности, содержимое..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Место 📍</label>
+                        <select id="item-location">
+                            <option value="КазНИТУ - ГУК">КазНИТУ - ГУК</option>
+                            <option value="КазНИТУ - ГМК">КазНИТУ - ГМК</option>
+                            <option value="КазНИТУ - ККУЦ">КазНИТУ - ККУЦ</option>
+                            <option value="КазНИТУ - Общежитие №1">КазНИТУ - Общежитие №1</option>
+                            <option value="Метро Байконыр">Метро Байконыр</option>
+                            <option value="Satbayev Park">Satbayev Park</option>
+                            <option value="ТРЦ Forum">ТРЦ Forum</option>
+                            <option value="UniHUB">UniHUB</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Дата потери/находки</label>
+                        <input type="date" id="item-date">
+                    </div>
+
+                    <button class="btn btn-primary" onclick="publishAnnouncement()">Опубликовать объявление</button>
+                </div>
+            </div>
+
+            <!-- PROFILE Screen -->
+            <div class="screen" id="screen-profile">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <div class="avatar" style="width: 80px; height: 80px; font-size: 40px; margin: 0 auto 15px;">💼</div>
+                    <h2 style="color: #333; font-size: 20px; margin-bottom: 5px;">Ганиев Михаил</h2>
+                    <p style="color: #999; font-size: 13px; margin-bottom: 10px;">@ganiev.osman.mikhail</p>
+                    <div style="display: flex; justify-content: center; gap: 5px;">
+                        <span class="star">⭐</span>
+                        <span class="star">⭐</span>
+                        <span class="star">⭐</span>
+                        <span class="star">⭐</span>
+                        <span class="star">⭐</span>
+                        <span style="color: #999; font-size: 12px; margin-left: 5px;">4.8 (45 отзывов)</span>
+                    </div>
+                </div>
+
+                <div class="stats">
+                    <div class="stat-card">
+                        <span class="stat-number" id="stat-found">0</span>
+                        <span class="stat-label">Найдено вещей</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number" id="stat-recovered">0</span>
+                        <span class="stat-label">Восстановлено</span>
+                    </div>
+                </div>
+
+                <h3 style="font-size: 16px; font-weight: 700; margin: 25px 0 15px; color: #333;">Мои объявления</h3>
+
+                <div id="profile-items">
+                    <!-- Объявления будут добавлены -->
+                </div>
+
+                <button class="btn btn-secondary" style="margin-top: 20px;" onclick="clearAllData()">Очистить все данные</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detail -->
+    <div class="modal" id="detail-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title"></h2>
+                <button class="close-btn" onclick="closeModal()">✕</button>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('details')">Детали</button>
+                <button class="tab" onclick="switchTab('contacts')">Контакты</button>
+                <button class="tab" onclick="switchTab('matches')">Совпадения</button>
+            </div>
+
+            <div class="tab-content active" id="tab-details">
+                <div id="modal-details"></div>
+            </div>
+
+            <div class="tab-content" id="tab-contacts">
+                <div id="modal-contacts"></div>
+            </div>
+
+            <div class="tab-content" id="tab-matches">
+                <div id="modal-matches"></div>
+            </div>
+
+            <div class="action-buttons" style="margin-top: 20px;">
+                <button class="btn btn-primary" onclick="contactOwner()">Написать</button>
+                <button class="btn btn-secondary" onclick="shareItem()">Поделиться</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Default Mock Data
+        const defaultAnnouncements = [
+            {
+                id: 1,
+                type: 'lost',
+                title: 'Синий рюкзак',
+                description: 'Синий спортивный рюкзак марки Adidas, потеряна слева одна лямка, внутри косметичка Maybelline',
+                category: 'accessories',
+                location: 'КазНИТУ - ГУК',
+                date: '2024-02-15',
+                icon: '🎒',
+                user: {
+                    name: 'Бакиева Мадина',
+                    avatar: 'Б',
+                    rating: 4.7,
+                    reviews: 23
+                },
+                userCreated: false
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { 
-                    legend: { position: "bottom", labels: { color: getComputedStyle(document.documentElement).getPropertyValue('--text') } }
+            {
+                id: 2,
+                type: 'found',
+                title: 'iPhone 15 Pro',
+                description: 'Черный смартфон в черном чехле, найден в метро на линии Сокольнической',
+                category: 'electronics',
+                location: 'Метро Байконыр',
+                date: '2024-02-16',
+                icon: '📱',
+                user: {
+                    name: 'Дмитрий Попов',
+                    avatar: 'Д',
+                    rating: 4.9,
+                    reviews: 56
+                },
+                userCreated: false
+            },
+            {
+                id: 3,
+                type: 'lost',
+                title: 'Документы и паспорт',
+                description: 'Коричневая папка с важными документами, паспортом и билетом на самолет. Очень прошу вернуть!',
+                category: 'documents',
+                location: 'Satbayev Park',
+                date: '2024-02-14',
+                icon: '📄',
+                user: {
+                    name: 'Болатбеков Алибек',
+                    avatar: 'Б',
+                    rating: 5.0,
+                    reviews: 12
+                },
+                userCreated: false
+            },
+            {
+                id: 4,
+                type: 'found',
+                title: 'Золотые серьги',
+                description: 'Пара золотых серег с бриллиантами. Найдены в ТЦ Forum на втором этаже',
+                category: 'accessories',
+                location: 'ТРЦ Forum',
+                date: '2024-02-16',
+                icon: '💎',
+                user: {
+                    name: 'Самалбекова Дильназ',
+                    avatar: 'С',
+                    rating: 4.8,
+                    reviews: 34
+                },
+                userCreated: false
+            },
+            {
+                id: 5,
+                type: 'lost',
+                title: 'Белые наушники AirPods',
+                description: 'Левый наушник потерян. На случай, если вы найдете один наушник - пожалуйста, отпишите',
+                category: 'electronics',
+                location: 'UniHUB',
+                date: '2024-02-13',
+                icon: '🎧',
+                user: {
+                    name: 'Никита Титов',
+                    avatar: 'Н',
+                    rating: 4.6,
+                    reviews: 18
+                },
+                userCreated: false
+            },
+            {
+                id: 6,
+                type: 'found',
+                title: 'Ключи с красной меткой',
+                description: 'Пучок ключей (примерно 5 штук) с красной пластиковой меткой и номером квартиры',
+                category: 'other',
+                location: 'КазНИТУ - ККУЦ',
+                date: '2024-02-16',
+                icon: '🔑',
+                user: {
+                    name: 'Алексей Смирнов',
+                    avatar: 'А',
+                    rating: 4.9,
+                    reviews: 41
+                },
+                userCreated: false
+            }
+        ];
+
+        let currentFilter = 'all';
+        let currentCreateType = 'lost';
+        let announcements = [];
+        let currentDetailItem = null;
+
+        // Иконки по категориям
+        const categoryIcons = {
+            'accessories': '👜',
+            'electronics': '🎧',
+            'documents': '📄',
+            'money': '💰',
+            'keys': '🔑',
+            'other': '📦'
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFromCache();
+            displayCards();
+            setDefaultDate();
+            updateProfileStats();
+        });
+
+        // === CACHE ФУНКЦИИ ===
+        function saveToCache() {
+            localStorage.setItem('lostfind_announcements', JSON.stringify(announcements));
+        }
+
+        function loadFromCache() {
+            const cached = localStorage.getItem('lostfind_announcements');
+            if (cached) {
+                announcements = JSON.parse(cached);
+            } else {
+                announcements = JSON.parse(JSON.stringify(defaultAnnouncements));
+                saveToCache();
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('Вы уверены? Это удалит все ваши объявления!')) {
+                localStorage.removeItem('lostfind_announcements');
+                announcements = JSON.parse(JSON.stringify(defaultAnnouncements));
+                saveToCache();
+                displayCards();
+                displayProfileItems();
+                updateProfileStats();
+                showNotification('Все данные очищены ✨', 'info');
+            }
+        }
+
+        // === UI ФУНКЦИИ ===
+        function showScreen(screenName) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(`screen-${screenName}`).classList.add('active');
+
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            event.target.closest('.nav-item').classList.add('active');
+
+            if (screenName === 'profile') {
+                displayProfileItems();
+                updateProfileStats();
+            }
+        }
+
+        function displayCards() {
+            const container = document.getElementById('cards-container');
+            container.innerHTML = '';
+
+            const filtered = announcements.filter(item => {
+                if (currentFilter === 'all') return true;
+                return item.type === currentFilter;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <div class="empty-state-text">Объявлений не найдено</div>
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach(item => {
+                const card = createCard(item);
+                container.appendChild(card);
+            });
+        }
+
+        function createCard(item) {
+            const div = document.createElement('div');
+            div.className = 'card';
+
+            const imageClass = item.type === 'found' ? 'found' : 'lost';
+            const badgeText = item.type === 'found' ? '✅ Найдено' : '📍 Потеряно';
+            const badgeClass = item.type === 'found' ? 'found' : 'lost';
+
+            // Определяем иконку
+            let icon = item.icon || categoryIcons[item.category] || '📦';
+
+            const deleteBtn = item.userCreated ? 
+                `<button class="delete-btn" onclick="deleteAnnouncement(${item.id}, event)">✕</button>` 
+                : '';
+
+            const userBadge = item.userCreated ? 
+                `<span class="badge user-created">Ваше объявление</span>` 
+                : '';
+
+            div.innerHTML = `
+                <div class="card-image ${imageClass}">
+                    <span>${icon}</span>
+                    <span class="badge ${badgeClass}">${badgeText}</span>
+                    ${userBadge}
+                    ${deleteBtn}
+                </div>
+                <div class="card-title">${item.title}</div>
+                <div class="card-description">${item.description.substring(0, 60)}...</div>
+                <div class="card-location">📍 ${item.location}</div>
+                <div class="card-meta">
+                    <span>${new Date(item.date).toLocaleDateString('ru-RU')}</span>
+                    <span>${item.category}</span>
+                </div>
+                <div class="card-user">
+                    <div class="avatar" style="width: 40px; height: 40px; font-size: 16px;">${item.user.avatar}</div>
+                    <div class="user-info">
+                        <div class="user-name">${item.user.name}</div>
+                        <div class="user-rating">⭐ ${item.user.rating} (${item.user.reviews})</div>
+                    </div>
+                </div>
+            `;
+
+            div.addEventListener('click', (e) => {
+                if (!e.target.closest('.delete-btn')) {
+                    showDetail(item);
                 }
+            });
+
+            return div;
+        }
+
+        function filterCards(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            displayCards();
+        }
+
+        function filterSearch(filter) {
+            document.querySelectorAll('.filter-tabs .filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function toggleCreateType(type, element) {
+            currentCreateType = type;
+            document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        function showDetail(item) {
+            currentDetailItem = item;
+            document.getElementById('modal-title').textContent = item.title;
+
+            const detailsHTML = `
+                <div class="card-image ${item.type === 'found' ? 'found' : 'lost'}" style="margin-bottom: 20px;">
+                    <span style="font-size: 80px;">${item.icon || categoryIcons[item.category] || '📦'}</span>
+                    <span class="badge ${item.type === 'found' ? 'found' : 'lost'}">${item.type === 'found' ? '✅ Найдено' : '📍 Потеряно'}</span>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 10px; color: #333;">Описание</h3>
+                    <p style="color: #666; font-size: 14px; line-height: 1.6;">${item.description}</p>
+                </div>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <div style="margin-bottom: 12px;">
+                        <div style="font-size: 12px; color: #999;">📍 Место</div>
+                        <div style="font-weight: 600; color: #333;">${item.location}</div>
+                    </div>
+                    <div style="margin-bottom: 12px;">
+                        <div style="font-size: 12px; color: #999;">📅 Дата</div>
+                        <div style="font-weight: 600; color: #333;">${new Date(item.date).toLocaleDateString('ru-RU')}</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 12px; color: #999;">🏷️ Категория</div>
+                        <div style="font-weight: 600; color: #333;">${item.category}</div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('modal-details').innerHTML = detailsHTML;
+
+            const contactsHTML = `
+                <div class="contact-info">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <div class="avatar" style="width: 80px; height: 80px; font-size: 36px; margin: 0 auto 15px;">${item.user.avatar}</div>
+                        <h3 style="color: #333; font-size: 16px; font-weight: 700;">${item.user.name}</h3>
+                        <div style="margin-bottom: 10px;">
+                            <span class="star">⭐</span>
+                            <span style="color: #999; font-size: 12px;">${item.user.rating} (${item.user.reviews} отзывов)</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <div class="contact-icon">📞</div>
+                        <div class="contact-text">
+                            <div class="contact-label">Телефон</div>
+                            <div class="contact-value" onclick="showNotification('+7 (747) 964-04-31 скопирован', 'success')">+7 (747) 964-04-31 <span style="font-size: 12px; color: #667eea;">→</span></div>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">💬</div>
+                        <div class="contact-text">
+                            <div class="contact-label">Telegram</div>
+                            <div class="contact-value" onclick="showNotification('@${item.user.name.replace(' ', '_')} скопирован', 'success')">@${item.user.name.replace(' ', '_')} <span style="font-size: 12px; color: #667eea;">→</span></div>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">✉️</div>
+                        <div class="contact-text">
+                            <div class="contact-label">Email</div>
+                            <div class="contact-value" onclick="showNotification('Email скопирован', 'success')">${item.user.name.toLowerCase().replace(' ', '.')}@gmail.com <span style="font-size: 12px; color: #667eea;">→</span></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('modal-contacts').innerHTML = contactsHTML;
+
+            const matchesHTML = `
+                <div style="margin-bottom: 20px;">
+                    <p style="color: #666; font-size: 14px; margin-bottom: 15px;">Похожие объявления, которые могут помочь найти вашу вещь:</p>
+                </div>
+                <div class="matches-list">
+                    ${announcements
+                        .filter(a => a.id !== item.id && a.category === item.category)
+                        .slice(0, 3)
+                        .map((match, idx) => `
+                            <div class="match-item">
+                                <div class="match-info">
+                                    <div class="match-title">${match.title}</div>
+                                    <div class="match-similarity">${100 - idx * 15}% совпадение</div>
+                                </div>
+                                <div class="match-arrow">→</div>
+                            </div>
+                        `)
+                        .join('')}
+                </div>
+            `;
+
+            document.getElementById('modal-matches').innerHTML = matchesHTML;
+
+            document.getElementById('detail-modal').classList.add('active');
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+            event.target.classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('detail-modal').classList.remove('active');
+        }
+
+        function contactOwner() {
+            showNotification('Сообщение отправлено! ✉️', 'success');
+            closeModal();
+        }
+
+        function shareItem() {
+            showNotification('Ссылка скопирована в буфер обмена! 📋', 'success');
+        }
+
+        // === СОЗДАНИЕ ОБЪЯВЛЕНИЯ ===
+        function publishAnnouncement() {
+            const name = document.getElementById('item-name').value.trim();
+            const description = document.getElementById('item-description').value.trim();
+            const category = document.getElementById('item-category').value;
+            const location = document.getElementById('item-location').value;
+            const date = document.getElementById('item-date').value;
+
+            if (!name || !description) {
+                showNotification('Заполните все обязательные поля!', 'error');
+                return;
+            }
+
+            // Создаем новое объявление
+            const newAnnouncement = {
+                id: Math.max(...announcements.map(a => a.id), 0) + 1,
+                type: currentCreateType,
+                title: name,
+                description: description,
+                category: category,
+                location: location,
+                date: date,
+                icon: categoryIcons[category] || '📦',
+                user: {
+                    name: 'Ганиев Михаил',
+                    avatar: 'Г',
+                    rating: 4.8,
+                    reviews: 45
+                },
+                userCreated: true
+            };
+
+            // Добавляем в начало массива
+            announcements.unshift(newAnnouncement);
+            saveToCache();
+
+            // Показываем успех
+            resetCreateForm();
+            showNotification('Объявление успешно опубликовано! 🎉', 'success');
+
+            // Переходим на ленту
+            setTimeout(() => {
+                document.querySelectorAll('.nav-item')[0].click();
+                displayCards();
+            }, 500);
+        }
+
+        function resetCreateForm() {
+            document.getElementById('item-name').value = '';
+            document.getElementById('item-description').value = '';
+            document.getElementById('item-category').value = 'accessories';
+            document.getElementById('item-location').value = 'КазНИТУ - ГУК';
+            setDefaultDate();
+        }
+
+        function deleteAnnouncement(id, event) {
+            event.stopPropagation();
+            
+            if (confirm('Вы уверены? Это удалит объявление!')) {
+                announcements = announcements.filter(a => a.id !== id);
+                saveToCache();
+                displayCards();
+                displayProfileItems();
+                updateProfileStats();
+                showNotification('Объявление удалено ✨', 'info');
+            }
+        }
+
+        function setDefaultDate() {
+            const today = new Date().toISOString().split('T')[0];
+            const dateInput = document.getElementById('item-date');
+            if (dateInput) {
+                dateInput.value = today;
+            }
+        }
+
+        function displayProfileItems() {
+            const container = document.getElementById('profile-items');
+            const userItems = announcements.filter(a => a.userCreated);
+
+            if (userItems.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="padding: 20px;">
+                        <div class="empty-state-icon">📭</div>
+                        <div class="empty-state-text">У вас пока нет объявлений</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = userItems.map(item => `
+                <div class="card" onclick="showDetail(${JSON.stringify(item).replace(/"/g, '&quot;')})">
+                    <div class="card-image ${item.type === 'found' ? 'found' : 'lost'}" style="height: 120px; font-size: 40px; position: relative;">
+                        ${item.icon || categoryIcons[item.category] || '📦'}
+                        <span class="badge ${item.type === 'found' ? 'found' : 'lost'}">${item.type === 'found' ? '✅' : '📍'}</span>
+                        <button class="delete-btn" onclick="deleteAnnouncement(${item.id}, event)" style="opacity: 1;">✕</button>
+                    </div>
+                    <div class="card-title">${item.title}</div>
+                    <div class="card-location">📍 ${item.location}</div>
+                </div>
+            `).join('');
+        }
+
+        function updateProfileStats() {
+            const userItems = announcements.filter(a => a.userCreated);
+            const foundCount = userItems.filter(a => a.type === 'found').length;
+            const lostCount = userItems.filter(a => a.type === 'lost').length;
+
+            document.getElementById('stat-found').textContent = foundCount;
+            document.getElementById('stat-recovered').textContent = lostCount;
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Close modal on outside click
+        document.getElementById('detail-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
             }
         });
-    }
 
-    // Line Chart
-    const days = {};
-    for (let i = 0; i < 30; i++) {
-        const d = new Date();
-        d.setDate(d.getDate() - i);
-        const key = d.toLocaleDateString('ru-RU', { month: 'short', day: 'numeric' });
-        days[key] = { inc: 0, exp: 0 };
-    }
+        // Search functionality
+        document.getElementById('search-input')?.addEventListener('input', function(e) {
+            const query = e.target.value.toLowerCase();
+            const results = document.getElementById('search-results');
 
-    income.forEach(x => {
-        const key = new Date(x.d).toLocaleDateString('ru-RU', { month: 'short', day: 'numeric' });
-        if (days[key]) days[key].inc += x.a;
-    });
-    expense.forEach(x => {
-        const key = new Date(x.d).toLocaleDateString('ru-RU', { month: 'short', day: 'numeric' });
-        if (days[key]) days[key].exp += x.a;
-    });
+            if (!query) {
+                results.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔍</div>
+                        <div class="empty-state-text">Введите что-то для поиска</div>
+                    </div>
+                `;
+                return;
+            }
 
-    const lineCtx = document.getElementById("line");
-    if (lineChart) lineChart.destroy();
-    lineChart = new Chart(lineCtx, {
-        type: "line",
-        data: {
-            labels: Object.keys(days),
-            datasets: [
-                {
-                    label: "Доход",
-                    data: Object.values(days).map(d => d.inc),
-                    borderColor: "#48bb78",
-                    backgroundColor: "rgba(72, 187, 120, 0.1)",
-                    tension: 0.4,
-                    fill: true
-                },
-                {
-                    label: "Расход",
-                    data: Object.values(days).map(d => d.exp),
-                    borderColor: "#f56565",
-                    backgroundColor: "rgba(245, 101, 101, 0.1)",
-                    tension: 0.4,
-                    fill: true
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { position: "bottom" } }
-        }
-    });
+            const filtered = announcements.filter(item =>
+                item.title.toLowerCase().includes(query) ||
+                item.description.toLowerCase().includes(query) ||
+                item.location.toLowerCase().includes(query)
+            );
 
-    // Category stats
-    const catStats = {};
-    expense.forEach(x => {
-        catStats[x.c] = (catStats[x.c] || 0) + x.a;
-    });
-    
-    const sorted = Object.entries(catStats).sort((a, b) => b[1] - a[1]);
-    categoryStats.innerHTML = sorted.map(([cat, val]) => `
-        <div class="row">
-            <span>${cat}</span>
-            <b>${val.toFixed(2)}</b>
-        </div>
-    `).join("") || '<div class="empty-state">Нет расходов</div>';
-}
+            if (filtered.length === 0) {
+                results.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">😞</div>
+                        <div class="empty-state-text">Ничего не найдено</div>
+                    </div>
+                `;
+                return;
+            }
 
-function toggleTheme() {
-    document.body.classList.toggle("dark");
-    localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
-    playSuccess();
-}
+            results.innerHTML = filtered.map(item => {
+                const card = createCard(item);
+                return card.outerHTML;
+            }).join('');
 
-function renderCategories() {
-    const grid = document.getElementById("catGrid");
-    grid.innerHTML = cats.map(c => `
-        <div class="category-item">
-            <button class="category-btn ${activeCats.includes(c) ? "active" : ""}" onclick="toggleCategory(this, '${c}')">
-                ${c}
-            </button>
-            <button class="delete-cat" onclick="deleteCategory(event, '${c}')" title="Удалить категорию">✕</button>
-        </div>
-    `).join("");
-    
-    const allTxHtml = tx.slice().reverse().map(x => `
-        <div class="tx-item">
-            <div class="tx-info">
-                <div class="tx-name">${x.t === "income" ? "✅ Доход" : "📌 " + (x.c || "Другое")}</div>
-                <div class="tx-date">${new Date(x.d).toLocaleDateString('ru-RU')} ${x.n ? ' - ' + x.n : ''}</div>
-            </div>
-            <div class="tx-actions">
-                <div class="tx-amount ${x.t === "income" ? "green" : "red"}">${x.t === "income" ? "+" : "-"}${x.a.toFixed(2)}</div>
-                <button class="delete-btn" onclick="deleteTx(${x.id})">✕</button>
-            </div>
-        </div>
-    `).join("");
-    allTx.innerHTML = allTxHtml || '<div class="empty-state">📭 Нет операций</div>';
-}
-
-function toggleCategory(btn, cat) {
-    btn.classList.toggle("active");
-    if (activeCats.includes(cat)) {
-        activeCats = activeCats.filter(c => c !== cat);
-    } else {
-        activeCats.push(cat);
-    }
-    localStorage.setItem("activeCats", JSON.stringify(activeCats));
-    playSuccess();
-}
-
-function addCustomCategory() {
-    const input = document.getElementById("newCatInput");
-    const newCat = input.value.trim();
-    
-    if (!newCat) {
-        alert("Введите название категории");
-        return;
-    }
-    
-    if (cats.includes(newCat)) {
-        alert("Такая категория уже существует");
-        return;
-    }
-    
-    cats.push(newCat);
-    activeCats.push(newCat);
-    localStorage.setItem("cats", JSON.stringify(cats));
-    localStorage.setItem("activeCats", JSON.stringify(activeCats));
-    input.value = "";
-    playSuccess();
-    renderCategories();
-}
-
-function deleteCategory(event, cat) {
-    event.stopPropagation();
-    if (confirm(`Удалить категорию "${cat}"?`)) {
-        cats = cats.filter(c => c !== cat);
-        activeCats = activeCats.filter(c => c !== cat);
-        localStorage.setItem("cats", JSON.stringify(cats));
-        localStorage.setItem("activeCats", JSON.stringify(activeCats));
-        playDelete();
-        renderCategories();
-        setType(type);
-    }
-}
-
-function clearData() {
-    if (confirm("⚠️ Вы уверены? Это удалит все данные без возможности восстановления!")) {
-        tx = [];
-        localStorage.setItem("tx", JSON.stringify(tx));
-        playDelete();
-        dash();
-        document.getElementById("allTx").innerHTML = '<div class="empty-state">📭 Нет операций</div>';
-    }
-}
-
-// Применить сохраненную тему
-if (localStorage.getItem("theme") === "dark") {
-    document.body.classList.add("dark");
-}
-
-dash();
-</script>
-
+            results.querySelectorAll('.card').forEach((card, idx) => {
+                card.onclick = () => showDetail(filtered[idx]);
+            });
+        });
+    </script>
 </body>
 </html>
